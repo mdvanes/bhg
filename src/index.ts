@@ -1,13 +1,19 @@
 /* eslint-disable no-process-exit */
 /* eslint-disable unicorn/no-process-exit */
-/* eslint-disable no-console */
 import { Command, flags } from "@oclif/command";
 import { option } from "@oclif/parser/lib/flags";
 import chalk = require("chalk");
 import { exec as origExec } from "child_process";
 import { readFileSync } from "fs";
 import { promisify } from "util";
+import { homedir } from "os";
+
 const exec = promisify(origExec);
+
+const logError = (message: string): void => {
+  // eslint-disable-next-line no-console
+  console.error(chalk.bold.red(message));
+}
 
 class Bhg extends Command {
   static description = "Azure toolkit";
@@ -36,7 +42,7 @@ class Bhg extends Command {
     // }
     if (args.pcom === "ps") {
       this.log("try to ps remotely...");
-      const OPTIONS_PATH = "~/.bhg/options.json";
+      const OPTIONS_PATH = `${homedir}/.bhg/options.json`;
       const INVALID_TENANT_ID = "INVALID_TENANT_ID";
 
       let tenantId = undefined;
@@ -46,20 +52,19 @@ class Bhg extends Command {
           optionsJson.toString()
         );
         if (options.tenantId) {
-          console.log(option);
           tenantId = options.tenantId;
         } else {
           throw new Error(INVALID_TENANT_ID);
         }
       } catch (error) {
         if((error as Error).message === INVALID_TENANT_ID) {
-          console.error(
+          logError(
             `You should fill ${OPTIONS_PATH} with { "tenantId": "TENANT_ID" } where TENANT_ID is an ID that can be found on Azure Active Directory`
           );
           process.exit(0);
         }
         if ((error as any).code === "ENOENT") {
-          console.error(
+          logError(
             `You should create a ${OPTIONS_PATH} containing { "tenantId": "TENANT_ID" } where TENANT_ID is an ID that can be found on Azure Active Directory`
           );
           process.exit(0);
