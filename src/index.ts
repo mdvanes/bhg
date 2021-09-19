@@ -8,6 +8,7 @@ import getOptions from "./get-options";
 const exec = promisify(origExec);
 
 const CLOUDSTUDY_ACI_CONTEXT = "cloudstudyAciContext";
+const RG_CLOUDSTUDY_FE = "rg-CloudStudyFe";
 
 const createContext = async (
   self: ChalkLoggerCommand,
@@ -22,11 +23,11 @@ const createContext = async (
       self.log("Azure login OK");
 
       const { stdout: stdout1 } = await exec(
-        `docker context create aci ${CLOUDSTUDY_ACI_CONTEXT}`
+        `docker context create aci ${CLOUDSTUDY_ACI_CONTEXT} --resource-group ${RG_CLOUDSTUDY_FE}`
       );
 
-      if (stdout1 && stdout1 === CLOUDSTUDY_ACI_CONTEXT) {
-        self.log(`Correctly created context ${CLOUDSTUDY_ACI_CONTEXT}`);
+      if (stdout1 && stdout1.indexOf(`Successfully created aci context "${CLOUDSTUDY_ACI_CONTEXT}"`) > -1) {
+        self.log(stdout1);
         return true;
       }
 
