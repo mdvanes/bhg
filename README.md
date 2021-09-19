@@ -4,16 +4,6 @@
 
 [Azure](https://azure.microsoft.com/en-us/) (a kind of [blue](https://en.wikipedia.org/wiki/Azure_(color))) + [Code**star**](https://code-star.github.io) = [Blue Hypergiant](https://en.wikipedia.org/wiki/Hypergiant#Blue_hypergiants) = `bhg`
 
-## Purpose
-
-1. Try out [oclif](https://oclif.io/)
-2. Make it easier to remember specific Azure commands (yes, that could be a bash script)
-
-## Usage
-
-- `bhg` display all commands
-
-
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
 [![Version](https://img.shields.io/npm/v/bhg.svg)](https://npmjs.org/package/bhg)
@@ -21,9 +11,16 @@
 [![License](https://img.shields.io/npm/l/bhg.svg)](https://github.com/mdvanes/bhg/blob/master/package.json)
 
 <!-- toc -->
+* [Purpose](#purpose)
 * [Usage](#usage)
 * [Commands](#commands)
 <!-- tocstop -->
+
+## Purpose
+
+1. Try out [oclif](https://oclif.io/)
+2. Make it easier to remember specific Azure commands (yes, that could be a bash script)
+
 # Usage
 <!-- usage -->
 ```sh-session
