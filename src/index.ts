@@ -1,4 +1,5 @@
 import { flags } from "@oclif/command";
+import chalk = require("chalk");
 // import { option } from "@oclif/parser/lib/flags";
 import { exec as origExec } from "child_process";
 import { promisify } from "util";
@@ -18,10 +19,12 @@ const createContext = async (
     "A browser window will open, log in to the correct Azure instance"
   );
   try {
+    self.log(chalk.bgBlack(`docker login azure --tenant-id ${tenantId}`));
     const { stdout } = await exec(`docker login azure --tenant-id ${tenantId}`);
     if (stdout && stdout.indexOf("login succeeded") > -1) {
       self.logStep("Azure login OK");
 
+      self.log(chalk.bgBlack(`docker context create aci ${CLOUDSTUDY_ACI_CONTEXT} --resource-group ${RG_CLOUDSTUDY_FE}`));
       const { stdout: stdout1 } = await exec(
         `docker context create aci ${CLOUDSTUDY_ACI_CONTEXT} --resource-group ${RG_CLOUDSTUDY_FE}`
       );
@@ -50,6 +53,7 @@ const prepareContext = async (
   self: ChalkLoggerCommand,
   tenantId: string
 ): Promise<boolean> => {
+  self.log(chalk.bgBlack("docker context show"));
   const { stdout } = await exec("docker context show");
   // TODO this will potentially fail when stdout starts with CLOUDSTUDY_ACI_CONTEXT but is different after that
   if (stdout && stdout.indexOf(CLOUDSTUDY_ACI_CONTEXT) > -1) {
@@ -62,6 +66,7 @@ const prepareContext = async (
     `You are not in the ACI context (${stdout}), I will try to switch to it`
   );
   try {
+    self.log(chalk.bgBlack(`docker context use ${CLOUDSTUDY_ACI_CONTEXT}`));
     const { stdout: stdout1 } = await exec(
       `docker context use ${CLOUDSTUDY_ACI_CONTEXT}`
     );
@@ -83,36 +88,6 @@ const prepareContext = async (
   }
   return false;
 };
-
-// const switchContext = async (self: ChalkLoggerCommand): Promise<boolean> => {
-//   self.logOk("Switching to the ACI context");
-//   try {
-//     const { stdout } = await exec(
-//       `docker context use ${CLOUDSTUDY_ACI_CONTEXT}`
-//     );
-//     self.log(stdout);
-//     return true;
-//     // if (stdout && stdout.indexOf("login succeeded") > -1) {
-//     //   self.log("Azure login OK");
-
-//     //   const { stdout: stdout1 } = await exec(
-//     //     `docker context create aci ${CLOUDSTUDY_ACI_CONTEXT} --resource-group ${RG_CLOUDSTUDY_FE}`
-//     //   );
-
-//     //   if (stdout1 && stdout1.indexOf(`Successfully created aci context "${CLOUDSTUDY_ACI_CONTEXT}"`) > -1) {
-//     //     self.log(stdout1);
-//     //     return true;
-//     //   }
-
-//     //   throw new Error("Unexpected failure when creating context");
-//     // }
-
-//     // throw new Error("Unexpected failure when logging in");
-//   } catch (error) {
-//     self.logError(("Could not create context" + error) as any);
-//     return false;
-//   }
-// };
 
 class Bhg extends ChalkLoggerCommand {
   static description = "Azure toolkit";
@@ -140,7 +115,7 @@ class Bhg extends ChalkLoggerCommand {
     //   this.log(`you input --force and --file: ${args.file}`)
     // }
     if (args.pcom === "ps") {
-      this.logStep("Trying to ps on ACI...");
+      this.log(`${chalk.blueBright("BlueHyperGiant")} running ${chalk.bgBlack("docker ps -a")} on ACI`);
 
       const { tenantId } = getOptions(this);
 

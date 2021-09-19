@@ -57,3 +57,10 @@ USAGE
 <!-- commandsstop -->
 
 <!-- commandsstop -->
+# Publishing
+
+```bash
+$ npm version patch
+$ npm publish
+$ npm -g @mdworld/bhg
+```
