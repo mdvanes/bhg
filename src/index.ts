@@ -20,9 +20,20 @@ const createContext = async (
     const { stdout } = await exec(`docker login azure --tenant-id ${tenantId}`);
     if (stdout && stdout.indexOf("login succeeded") > -1) {
       self.log("Azure login OK");
-      return true;
+
+      const { stdout: stdout1 } = await exec(
+        `docker context create aci ${CLOUDSTUDY_ACI_CONTEXT}`
+      );
+
+      if (stdout1 && stdout1 === CLOUDSTUDY_ACI_CONTEXT) {
+        self.log(`Correctly created context ${CLOUDSTUDY_ACI_CONTEXT}`);
+        return true;
+      }
+
+      throw new Error("Unexpected failure when creating context");
     }
-    throw new Error("Unexpected failure when logging in or creating context");
+
+    throw new Error("Unexpected failure when logging in");
   } catch (error) {
     self.logError(("Could not create context" + error) as any);
     return false;
