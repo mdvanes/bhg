@@ -1,6 +1,8 @@
 import {Command, flags} from '@oclif/command'
 import chalk = require('chalk');
-import {exec} from 'child_process'
+import {exec as origExec} from 'child_process'
+import {promisify} from 'util'
+const exec = promisify(origExec)
 
 class Bhg extends Command {
   static description = 'Azure toolkit';
@@ -29,11 +31,15 @@ class Bhg extends Command {
     // }
     if (args.pcom === 'ps') {
       this.log('try to ps remotely...')
-      // TODO docker use context
       // TODO docker login azure --tentant-id ??
-      exec('docker ps', (error, stdout, _stderr) => {
-        console.log(chalk.blue(stdout))
-      })
+      // TODO docker context create cloudstudyAciContext
+      // TODO docker context use cloudstudyAciContext
+      // if this fails with "not found",
+      // log: first create the cloudstudyAciContext.
+      // If that fails, log: first login to azure with the tenant ID that can be found in portal.azure.com under Azure Active Directory
+
+      const {stdout} = await exec('docker ps')
+      console.log(chalk.blue(stdout))
     }
   }
 }
