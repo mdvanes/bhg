@@ -14,6 +14,11 @@
 * [bhg](#bhg)
 * [Usage](#usage)
 * [Commands](#commands)
+* [Publishing](#publishing)
+<!-- tocstop -->
+* [bhg](#bhg)
+* [Usage](#usage)
+* [Commands](#commands)
 <!-- tocstop -->
 * [Purpose](#purpose)
 * [Usage](#usage)
@@ -27,6 +32,18 @@
 
 # Usage
 <!-- usage -->
+```sh-session
+$ npm install -g @mdworld/bhg
+$ bhg COMMAND
+running command...
+$ bhg (-v|--version|version)
+@mdworld/bhg/1.0.1 linux-x64 node-v15.0.1
+$ bhg --help [COMMAND]
+USAGE
+  $ bhg COMMAND
+...
+```
+<!-- usagestop -->
 ```sh-session
 $ npm install -g @mdworld/bhg
 $ bhg COMMAND
@@ -53,6 +70,8 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
+
+<!-- commandsstop -->
 
 <!-- commandsstop -->
 
