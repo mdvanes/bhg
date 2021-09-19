@@ -7,6 +7,38 @@ import getOptions from "./get-options";
 
 const exec = promisify(origExec);
 
+const CLOUDSTUDY_ACI_CONTEXT = "cloudstudyAciContext";
+
+const createContext = async (self:ChalkLoggerCommand, tenantId: string): Promise<boolean> => {
+  const { stdout: stdout2 } = await exec(`docker login azure --tentant-id ${tenantId}`);
+  self.log(stdout2);
+  return true;
+}
+
+const prepareContext = async (self: ChalkLoggerCommand, tenantId: string): Promise<boolean> => {
+  const { stdout } = await exec("docker context show");
+  if (stdout === CLOUDSTUDY_ACI_CONTEXT) {
+    return true;
+  }
+  self.log(`You are not in the ACI context, I will try to switch to it`);
+  try {
+    const { stdout: stdout1 } = await exec(
+      `docker context use ${CLOUDSTUDY_ACI_CONTEXT}`
+    );
+    self.log(stdout1);
+  } catch (error) {
+    if (
+      (error as any).stderr &&
+      (error as any).stderr.indexOf("not found") > -1
+    ) {
+      self.log("The ACI context does not exist yet, I will try to create it");
+      createContext(self, tenantId);
+    }
+    self.log((error as any).stderr);
+  }
+  return false;
+};
+
 class Bhg extends ChalkLoggerCommand {
   static description = "Azure toolkit";
 
@@ -24,7 +56,6 @@ class Bhg extends ChalkLoggerCommand {
     { name: "pcom", description: "pseudo command", options: ["ps"] }, // TODO convert to multi command
   ];
 
-
   async run() {
     const { args, flags } = this.parse(Bhg);
 
@@ -40,12 +71,10 @@ class Bhg extends ChalkLoggerCommand {
 
       this.log(`tenantId: ${tenantId}`);
 
+      prepareContext(this, tenantId);
+
       // TODO docker login azure --tentant-id <my_tenant_id>
       // TODO docker context create cloudstudyAciContext
-      // TODO docker context use cloudstudyAciContext
-      // if this fails with "not found",
-      // log: first create the cloudstudyAciContext.
-      // If that fails, log: first login to azure with the tenant ID that can be found in portal.azure.com under Azure Active Directory
 
       const { stdout } = await exec("docker ps");
       this.logProcOutput(stdout);
