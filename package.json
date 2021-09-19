@@ -1,7 +1,7 @@
 {
   "name": "@mdworld/bhg",
   "description": "A simple toolkit for Azure",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "M.D. van Es @mdworldNL",
   "bin": {
     "bhg": "bin/run"

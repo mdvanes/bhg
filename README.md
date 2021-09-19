@@ -37,7 +37,7 @@ $ npm install -g @mdworld/bhg
 $ bhg COMMAND
 running command...
 $ bhg (-v|--version|version)
-@mdworld/bhg/1.0.1 linux-x64 node-v15.0.1
+@mdworld/bhg/1.0.2 linux-x64 node-v15.0.1
 $ bhg --help [COMMAND]
 USAGE
   $ bhg COMMAND
