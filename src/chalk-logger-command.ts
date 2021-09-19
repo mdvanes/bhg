@@ -6,6 +6,10 @@ abstract class ChalkLoggerCommand extends Command {
     this.log(chalk.blue(message));
   }
 
+  logStep(message: string): void {
+    this.log(chalk.yellow(message));
+  }
+
   logOk(message: string): void {
     this.log(chalk.bold.green(message));
   }
