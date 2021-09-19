@@ -16,14 +16,6 @@
 * [Commands](#commands)
 * [Publishing](#publishing)
 <!-- tocstop -->
-* [bhg](#bhg)
-* [Usage](#usage)
-* [Commands](#commands)
-<!-- tocstop -->
-* [Purpose](#purpose)
-* [Usage](#usage)
-* [Commands](#commands)
-<!-- tocstop -->
 
 ## Purpose
 
@@ -44,42 +36,14 @@ USAGE
 ...
 ```
 <!-- usagestop -->
-```sh-session
-$ npm install -g @mdworld/bhg
-$ bhg COMMAND
-running command...
-$ bhg (-v|--version|version)
-@mdworld/bhg/1.0.0 linux-x64 node-v15.0.1
-$ bhg --help [COMMAND]
-USAGE
-  $ bhg COMMAND
-...
-```
-<!-- usagestop -->
-```sh-session
-$ npm install -g bhg
-$ bhg COMMAND
-running command...
-$ bhg (-v|--version|version)
-bhg/0.0.0 linux-x64 node-v15.0.1
-$ bhg --help [COMMAND]
-USAGE
-  $ bhg COMMAND
-...
-```
-<!-- usagestop -->
 # Commands
 <!-- commands -->
 
 <!-- commandsstop -->
 
-<!-- commandsstop -->
-
-<!-- commandsstop -->
 # Publishing
 
 ```bash
 $ npm version patch
-$ npm publish
-$ npm -g @mdworld/bhg
+$ npm publish --access=public
 ```
