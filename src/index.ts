@@ -1,21 +1,13 @@
-/* eslint-disable no-process-exit */
-/* eslint-disable unicorn/no-process-exit */
-import { Command, flags } from "@oclif/command";
-import { option } from "@oclif/parser/lib/flags";
-import chalk = require("chalk");
+import { flags } from "@oclif/command";
+// import { option } from "@oclif/parser/lib/flags";
 import { exec as origExec } from "child_process";
-import { readFileSync } from "fs";
 import { promisify } from "util";
-import { homedir } from "os";
+import ChalkLoggerCommand from "./chalk-logger-command";
+import getOptions from "./get-options";
 
 const exec = promisify(origExec);
 
-const logError = (message: string): void => {
-  // eslint-disable-next-line no-console
-  console.error(chalk.bold.red(message));
-}
-
-class Bhg extends Command {
+class Bhg extends ChalkLoggerCommand {
   static description = "Azure toolkit";
 
   static flags = {
@@ -32,6 +24,7 @@ class Bhg extends Command {
     { name: "pcom", description: "pseudo command", options: ["ps"] }, // TODO convert to multi command
   ];
 
+
   async run() {
     const { args, flags } = this.parse(Bhg);
 
@@ -42,37 +35,10 @@ class Bhg extends Command {
     // }
     if (args.pcom === "ps") {
       this.log("try to ps remotely...");
-      const OPTIONS_PATH = `${homedir}/.bhg/options.json`;
-      const INVALID_TENANT_ID = "INVALID_TENANT_ID";
 
-      let tenantId = undefined;
-      try {
-        const optionsJson = readFileSync(OPTIONS_PATH);
-        const options: Record<string, string> = JSON.parse(
-          optionsJson.toString()
-        );
-        if (options.tenantId) {
-          tenantId = options.tenantId;
-        } else {
-          throw new Error(INVALID_TENANT_ID);
-        }
-      } catch (error) {
-        if((error as Error).message === INVALID_TENANT_ID) {
-          logError(
-            `You should fill ${OPTIONS_PATH} with { "tenantId": "TENANT_ID" } where TENANT_ID is an ID that can be found on Azure Active Directory`
-          );
-          process.exit(0);
-        }
-        if ((error as any).code === "ENOENT") {
-          logError(
-            `You should create a ${OPTIONS_PATH} containing { "tenantId": "TENANT_ID" } where TENANT_ID is an ID that can be found on Azure Active Directory`
-          );
-          process.exit(0);
-        }
-        throw error;
-      }
+      const { tenantId } = getOptions(this);
 
-      console.log(chalk.green(tenantId));
+      this.log(`tenantId: ${tenantId}`);
 
       // TODO docker login azure --tentant-id <my_tenant_id>
       // TODO docker context create cloudstudyAciContext
@@ -82,7 +48,7 @@ class Bhg extends Command {
       // If that fails, log: first login to azure with the tenant ID that can be found in portal.azure.com under Azure Active Directory
 
       const { stdout } = await exec("docker ps");
-      console.log(chalk.blue(stdout));
+      this.logProcOutput(stdout);
     }
   }
 }
