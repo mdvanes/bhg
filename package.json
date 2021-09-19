@@ -1,10 +1,10 @@
 {
   "name": "@mdworld/bhg",
   "description": "A simple toolkit for Azure",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "author": "M.D. van Es @mdworldNL",
   "bin": {
-    "bhg": "./bin/run"
+    "bhg": "bin/run"
   },
   "bugs": "https://github.com/mdvanes/bhg/issues",
   "dependencies": {

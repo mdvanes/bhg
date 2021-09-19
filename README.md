@@ -11,6 +11,10 @@
 [![License](https://img.shields.io/npm/l/bhg.svg)](https://github.com/mdvanes/bhg/blob/master/package.json)
 
 <!-- toc -->
+* [bhg](#bhg)
+* [Usage](#usage)
+* [Commands](#commands)
+<!-- tocstop -->
 * [Purpose](#purpose)
 * [Usage](#usage)
 * [Commands](#commands)
@@ -23,6 +27,18 @@
 
 # Usage
 <!-- usage -->
+```sh-session
+$ npm install -g @mdworld/bhg
+$ bhg COMMAND
+running command...
+$ bhg (-v|--version|version)
+@mdworld/bhg/1.0.0 linux-x64 node-v15.0.1
+$ bhg --help [COMMAND]
+USAGE
+  $ bhg COMMAND
+...
+```
+<!-- usagestop -->
 ```sh-session
 $ npm install -g bhg
 $ bhg COMMAND
@@ -37,5 +53,7 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
+
+<!-- commandsstop -->
 
 <!-- commandsstop -->
