@@ -9,13 +9,30 @@ const exec = promisify(origExec);
 
 const CLOUDSTUDY_ACI_CONTEXT = "cloudstudyAciContext";
 
-const createContext = async (self:ChalkLoggerCommand, tenantId: string): Promise<boolean> => {
-  const { stdout: stdout2 } = await exec(`docker login azure --tentant-id ${tenantId}`);
-  self.log(stdout2);
-  return true;
-}
+const createContext = async (
+  self: ChalkLoggerCommand,
+  tenantId: string
+): Promise<boolean> => {
+  self.logOk(
+    "A browser window will open, log in to the correct Azure instance"
+  );
+  try {
+    const { stdout } = await exec(`docker login azure --tenant-id ${tenantId}`);
+    if (stdout && stdout.indexOf("login succeeded") > -1) {
+      self.log("Azure login OK");
+      return true;
+    }
+    throw new Error("Unexpected failure when logging in or creating context");
+  } catch (error) {
+    self.logError(("Could not create context" + error) as any);
+    return false;
+  }
+};
 
-const prepareContext = async (self: ChalkLoggerCommand, tenantId: string): Promise<boolean> => {
+const prepareContext = async (
+  self: ChalkLoggerCommand,
+  tenantId: string
+): Promise<boolean> => {
   const { stdout } = await exec("docker context show");
   if (stdout === CLOUDSTUDY_ACI_CONTEXT) {
     return true;
@@ -34,7 +51,7 @@ const prepareContext = async (self: ChalkLoggerCommand, tenantId: string): Promi
       self.log("The ACI context does not exist yet, I will try to create it");
       createContext(self, tenantId);
     }
-    self.log((error as any).stderr);
+    self.log((error as any).stderr); // TODO remove
   }
   return false;
 };
@@ -73,7 +90,7 @@ class Bhg extends ChalkLoggerCommand {
 
       prepareContext(this, tenantId);
 
-      // TODO docker login azure --tentant-id <my_tenant_id>
+      // TODO docker login azure --tenant-id <my_tenant_id>
       // TODO docker context create cloudstudyAciContext
 
       const { stdout } = await exec("docker ps");
