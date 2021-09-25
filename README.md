@@ -6,9 +6,9 @@
 
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
-[![Version](https://img.shields.io/npm/v/bhg.svg)](https://npmjs.org/package/bhg)
-[![Downloads/week](https://img.shields.io/npm/dw/bhg.svg)](https://npmjs.org/package/bhg)
-[![License](https://img.shields.io/npm/l/bhg.svg)](https://github.com/mdvanes/bhg/blob/master/package.json)
+[![Version](https://img.shields.io/npm/v/bhg.svg)](https://npmjs.org/package/@mdworld/bhg)
+[![Downloads/week](https://img.shields.io/npm/dw/bhg.svg)](https://npmjs.org/package/@mdworld/bhg)
+[![License](https://img.shields.io/npm/l/bhg.svg)](https://github.com/mdvanes/bhg/blob/main/package.json)
 
 <!-- toc -->
 * [bhg](#bhg)
