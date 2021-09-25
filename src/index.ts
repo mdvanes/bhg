@@ -152,31 +152,49 @@ class Bhg extends ChalkLoggerCommand {
     if (args.pcom === "ps2") {
       // For migrating ps implementation to listr
       this.log("ps2!");
-      const tasks = new Listr([
-        {
-          title: "Fake wait",
-          task: async () => {
-            const wait = () => new Promise((resolve) => {
-              setTimeout(() => {
-                resolve(1);
-              }, 2000);
-            });
-            return wait();
+      const tasks = new Listr(
+        [
+          {
+            title: "Fake wait",
+            task: async (_ctx, task) => {
+              task.output = "Waiting fakely...";
+              const wait = () =>
+                new Promise((resolve) => {
+                  setTimeout(() => {
+                    resolve(1);
+                  }, 1000);
+                });
+              return wait();
+            },
           },
-        },
-        {
-          title: "Check ACI context",
-          task: async (_ctx, _task) => {
-            const cmd = "docker ps"; // "docker context show";
-            try {
-              const x = await execa("docker", ["context", "show"]);
-              this.log(x.stdout);
-            } catch (error) {
-              this.log("error", error);
-            }
+          {
+            title: "Check ACI context",
+            task: async (ctx, task) => {
+              const cmd: [string, string[]] = ["docker", ["context", "show"]];
+              // this.logStep(cmd.join());
+              task.output = cmd.join(" ");
+              try {
+                // const x = await execa("docker", ["context", "show"]);
+                const { stdout } = await execa(...cmd);
+                ctx.dockerContext = stdout;
+
+                if (ctx.dockerContext === CLOUDSTUDY_ACI_CONTEXT) {
+                  // this.log("all is well!");
+                  task.output = "all is well!";
+                } else {
+                  // this.log(`context is: ${ctx.dockerContext}`);
+                  task.output = `context is: ${ctx.dockerContext}`;
+                }
+
+                // this.log(stdout);
+              } catch (error) {
+                this.log("error", error);
+              }
+            },
           },
-        },
-      ]);
+        ],
+        { renderer: "verbose" }
+      );
       tasks.run().catch((error) => this.log(error));
     }
   }
