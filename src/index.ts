@@ -5,6 +5,9 @@ import { exec as origExec } from "child_process";
 import { promisify } from "util";
 import ChalkLoggerCommand from "./chalk-logger-command";
 import getOptions from "./get-options";
+import Listr from "listr";
+// import Conf from "conf";
+import execa from "execa";
 
 const exec = promisify(origExec);
 
@@ -24,7 +27,11 @@ const createContext = async (
     if (stdout && stdout.indexOf("login succeeded") > -1) {
       self.logStep("Azure login OK");
 
-      self.log(chalk.bgBlack(`docker context create aci ${CLOUDSTUDY_ACI_CONTEXT} --resource-group ${RG_CLOUDSTUDY_FE}`));
+      self.log(
+        chalk.bgBlack(
+          `docker context create aci ${CLOUDSTUDY_ACI_CONTEXT} --resource-group ${RG_CLOUDSTUDY_FE}`
+        )
+      );
       const { stdout: stdout1 } = await exec(
         `docker context create aci ${CLOUDSTUDY_ACI_CONTEXT} --resource-group ${RG_CLOUDSTUDY_FE}`
       );
@@ -57,10 +64,8 @@ const prepareContext = async (
   const { stdout } = await exec("docker context show");
   // TODO this will potentially fail when stdout starts with CLOUDSTUDY_ACI_CONTEXT but is different after that
   if (stdout && stdout.indexOf(CLOUDSTUDY_ACI_CONTEXT) > -1) {
-    self.logStep(
-      `You are in the ACI context "${CLOUDSTUDY_ACI_CONTEXT}"`
-    );
-      return true;
+    self.logStep(`You are in the ACI context "${CLOUDSTUDY_ACI_CONTEXT}"`);
+    return true;
   }
   self.logStep(
     `You are not in the ACI context (${stdout}), I will try to switch to it`
@@ -70,13 +75,17 @@ const prepareContext = async (
     const { stdout: stdout1 } = await exec(
       `docker context use ${CLOUDSTUDY_ACI_CONTEXT}`
     );
-    self.logStep(`Now in context: ${stdout1}. Re-run the process to try now you are in the correct context`);
-} catch (error) {
+    self.logStep(
+      `Now in context: ${stdout1}. Re-run the process to try now you are in the correct context`
+    );
+  } catch (error) {
     if (
       (error as any).stderr &&
       (error as any).stderr.indexOf("not found") > -1
     ) {
-      self.logStep("The ACI context does not exist yet, I will try to create it");
+      self.logStep(
+        "The ACI context does not exist yet, I will try to create it"
+      );
       const isCreated = await createContext(self, tenantId);
       if (isCreated) {
         self.logStep(
@@ -103,7 +112,11 @@ class Bhg extends ChalkLoggerCommand {
   };
 
   static args = [
-    { name: "pcom", description: "pseudo command", options: ["ps"] }, // TODO convert to multi command
+    {
+      name: "pcom",
+      description: "pseudo command",
+      options: ["ps", "ps2", "start"],
+    }, // TODO convert to multi command
   ];
 
   async run() {
@@ -115,7 +128,11 @@ class Bhg extends ChalkLoggerCommand {
     //   this.log(`you input --force and --file: ${args.file}`)
     // }
     if (args.pcom === "ps") {
-      this.log(`${chalk.blueBright("BlueHyperGiant")} running ${chalk.bgBlack("docker ps -a")} on ACI`);
+      this.log(
+        `${chalk.blueBright("BlueHyperGiant")} running ${chalk.bgBlack(
+          "docker ps -a"
+        )} on ACI`
+      );
 
       const { tenantId } = getOptions(this);
 
@@ -130,6 +147,37 @@ class Bhg extends ChalkLoggerCommand {
 
       // TODO docker login azure --tenant-id <my_tenant_id>
       // TODO docker context create cloudstudyAciContext
+    }
+
+    if (args.pcom === "ps2") {
+      // For migrating ps implementation to listr
+      this.log("ps2!");
+      const tasks = new Listr([
+        {
+          title: "Fake wait",
+          task: async () => {
+            const wait = () => new Promise((resolve) => {
+              setTimeout(() => {
+                resolve(1);
+              }, 2000);
+            });
+            return wait();
+          },
+        },
+        {
+          title: "Check ACI context",
+          task: async (_ctx, _task) => {
+            const cmd = "docker ps"; // "docker context show";
+            try {
+              const x = await execa("docker", ["context", "show"]);
+              this.log(x.stdout);
+            } catch (error) {
+              this.log("error", error);
+            }
+          },
+        },
+      ]);
+      tasks.run().catch((error) => this.log(error));
     }
   }
 }
