@@ -14,6 +14,13 @@ const exec = promisify(origExec);
 const CLOUDSTUDY_ACI_CONTEXT = "cloudstudyAciContext";
 const RG_CLOUDSTUDY_FE = "rg-CloudStudyFe";
 
+const wait = () =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(1);
+    }, 1000);
+  });
+
 const createContext = async (
   self: ChalkLoggerCommand,
   tenantId: string
@@ -154,19 +161,14 @@ class Bhg extends ChalkLoggerCommand {
       this.log("ps2!");
       const tasks = new Listr(
         [
-          {
-            title: "Fake wait",
-            task: async (_ctx, task) => {
-              task.output = "Waiting fakely...";
-              const wait = () =>
-                new Promise((resolve) => {
-                  setTimeout(() => {
-                    resolve(1);
-                  }, 1000);
-                });
-              return wait();
-            },
-          },
+          // {
+          //   title: "Fake wait",
+          //   task: async (_ctx, task) => {
+          //     task.output = "Waiting fakely...";
+
+          //     return wait();
+          //   },
+          // },
           {
             title: "Check ACI context",
             task: async (ctx, task) => {
@@ -192,8 +194,43 @@ class Bhg extends ChalkLoggerCommand {
               }
             },
           },
+          {
+            title: "Not in ACI context, trying to switch to it",
+            // skip: (ctx) => {
+            //   return ctx.dockerContext === CLOUDSTUDY_ACI_CONTEXT;
+            // },
+            enabled: (ctx) => {
+              return ctx.dockerContext !== CLOUDSTUDY_ACI_CONTEXT;
+            },
+            task: async (_ctx, task) => {
+              task.output = `You are not in the ACI context (${CLOUDSTUDY_ACI_CONTEXT}), I will try to switch to it`;
+              await wait();
+              const cmd: [string, string[]] = [
+                "docker",
+                ["context", "use", CLOUDSTUDY_ACI_CONTEXT],
+              ];
+              const { stdout } = await execa(...cmd);
+              task.output = stdout;
+              await wait();
+              // self.logStep(
+              //   `You are not in the ACI context (${stdout}), I will try to switch to it`
+              // );
+              // try {
+              //   self.log(chalk.bgBlack(`docker context use ${CLOUDSTUDY_ACI_CONTEXT}`));
+              //   const { stdout: stdout1 } = await exec(
+              //     `docker context use ${CLOUDSTUDY_ACI_CONTEXT}`
+              //   );
+              //   self.logStep(
+              //     `Now in context: ${stdout1}. Re-run the process to try now you are in the correct context`
+              //   );
+              // } catch (error) {
+              throw new Error(
+                `Now in context: ${CLOUDSTUDY_ACI_CONTEXT}. Re-run the process to try now you are in the correct context`
+              );
+            },
+          },
         ],
-        { renderer: "verbose" }
+        { renderer: "default" }
       );
       tasks.run().catch((error) => this.log(error));
     }
